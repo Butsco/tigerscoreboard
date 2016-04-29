@@ -14,8 +14,18 @@ const int led = 13;
 /* Just a little test message.  Go to http://192.168.4.1 in a web browser
  * connected to this access point to see it.
  */
+void handleSubmit(){
+    if (server.args() > 0 ) {
+    for ( uint8_t i = 0; i < server.args(); i++ ) {
+      if (server.argName(i) == "fname") {
+         // do something here with value from server.arg(i);
+         
+        }
+      }
+    }
+}
 void handleRoot() {
-	digitalWrite ( led, 1 );
+  digitalWrite ( led, 1 );
   char temp[400];
   int sec = millis() / 1000;
   int min = sec / 60;
@@ -26,7 +36,7 @@ void handleRoot() {
 "<html>\
   <head>\
     <meta http-equiv='refresh' content='5'/>\
-    <title>ESP8266 Demo</title>\
+    <title>Tiger score</title>\
     <style>\
       body { background-color: #cccccc; font-family: Arial, Helvetica, Sans-Serif; Color: #000088; }\
     </style>\
@@ -34,7 +44,9 @@ void handleRoot() {
   <body>\
     <h1>Hello from ESP8266!</h1>\
     <p>Uptime: %02d:%02d:%02d</p>\
-    <img src=\"/test.svg\" />\
+    <form action='/submit' method='POST'><input type='text' name='fname'>\
+    <input type='submit' value='Submit'>\
+    </form>\
   </body>\
 </html>",
 
@@ -62,44 +74,31 @@ void handleNotFound() {
   server.send ( 404, "text/plain", message );
   digitalWrite ( led, 0 );
 }
-void drawGraph() {
-  String out = "";
-  char temp[100];
-  out += "<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" width=\"400\" height=\"150\">\n";
-  out += "<rect width=\"400\" height=\"150\" fill=\"rgb(250, 230, 210)\" stroke-width=\"1\" stroke=\"rgb(0, 0, 0)\" />\n";
-  out += "<g stroke=\"black\">\n";
-  int y = rand() % 130;
-  for (int x = 10; x < 390; x+= 10) {
-    int y2 = rand() % 130;
-    sprintf(temp, "<line x1=\"%d\" y1=\"%d\" x2=\"%d\" y2=\"%d\" stroke-width=\"1\" />\n", x, 140 - y, x + 10, 140 - y2);
-    out += temp;
-    y = y2;
-  }
-  out += "</g>\n</svg>\n";
-  server.send ( 200, "image/svg+xml", out);
-}
+
 void setup() {
-	delay(1000);
+  delay(1000);
     pinMode ( led, OUTPUT );
   digitalWrite ( led, 0 );
-	Serial.begin(115200);
-	Serial.println();
-	Serial.print("Configuring access point...");
-	/* You can remove the password parameter if you want the AP to be open. */
-	WiFi.softAP(ssid, password);
+  Serial.begin(115200);
+  Serial.println();
+  Serial.print("Configuring access point...");
+  /* You can remove the password parameter if you want the AP to be open. */
+  WiFi.softAP(ssid, password);
 
-	IPAddress myIP = WiFi.softAPIP();
-	Serial.print("AP IP address: ");
-	Serial.println(myIP);
-	server.on("/", handleRoot);
-  server.on ( "/test.svg", drawGraph );
+  IPAddress myIP = WiFi.softAPIP();
+  Serial.print("AP IP address: ");
+  Serial.println(myIP);
+  server.on("/", handleRoot);
+  server.on("/submit", handleSubmit);
+  
   server.on ( "/inline", []() {
     server.send ( 200, "text/plain", "this works as well" );
   } );
-	server.begin();
-	Serial.println("HTTP server started");
+  server.begin();
+  Serial.println("HTTP server started");
 }
 
 void loop() {
-	server.handleClient();
+  server.handleClient();
 }
+
