@@ -4,8 +4,8 @@
 #include <ESP8266mDNS.h>
 
 /* Set these to your desired credentials. */
-const char *ssid = "ESPap";
-const char *password = "thereisnospoon";
+const char *ssid = "Tiger";
+const char *password = "score";
 
 ESP8266WebServer server(80);
 
@@ -17,9 +17,10 @@ const int led = 13;
 void handleSubmit(){
     if (server.args() > 0 ) {
     for ( uint8_t i = 0; i < server.args(); i++ ) {
-      if (server.argName(i) == "fname") {
+      if (server.argName(i) == "hscore") {
          // do something here with value from server.arg(i);
-         
+         Serial.println(server.arg(i));
+         server.send ( 200, "text/html", temp );
         }
       }
     }
@@ -42,11 +43,12 @@ void handleRoot() {
     </style>\
   </head>\
   <body>\
-    <h1>Hello from ESP8266!</h1>\
-    <p>Uptime: %02d:%02d:%02d</p>\
-    <form action='/submit' method='POST'><input type='text' name='fname'>\
-    <input type='submit' value='Submit'>\
+    <h1>Hi input here the current gamescore</h1>\
+    <form action='/submit' method='POST'>
+      Home team score: <input type='text' name='hscore'><input type='submit' value='Submit'>\
+      Out team score: <input type='text' name='oscore'><input type='submit' value='Submit'>\
     </form>\
+    <p>Server uptime: %02d:%02d:%02d</p>\
   </body>\
 </html>",
 
